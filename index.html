@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2540ff">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Inglés de a poco</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2f7;--panel:#fff;--ink:#17233a;--mute:#5b6b85;--line:#d3dbe8;--brand:#2540ff;--on:#fff;--ok:#16825d;--okbg:#d9f3e8;--bad:#c23552;--badbg:#fde1e6;
+--d:"Familjen Grotesk",system-ui,sans-serif;--b:"Source Sans 3",system-ui,sans-serif}
+@media(prefers-color-scheme:dark){:root{--bg:#121a2b;--panel:#1b263d;--ink:#e8eefc;--mute:#9db0d0;--line:#2e3c5a;--brand:#7d92ff;--on:#0d1530;--ok:#5fd9a6;--okbg:#17372f;--bad:#ff8fa3;--badbg:#40212b}}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--ink);font:400 18px/1.5 var(--b);
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+main{max-width:560px;margin:0 auto;padding:24px 18px 100px}
+h1{font:700 clamp(40px,12vw,64px)/1 var(--d);margin:0 0 6px;letter-spacing:-.02em}
+h2{font:700 24px var(--d);margin:0 0 10px}
+.sub{color:var(--mute);margin:0 0 22px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
+.st{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}
+.st b{display:block;font:700 30px var(--d)}
+.st span{color:var(--mute);font-size:15px}
+.btn{font:600 18px var(--b);border:2px solid var(--line);background:var(--panel);color:var(--ink);border-radius:14px;padding:13px 18px;cursor:pointer}
+.btn.main{background:var(--brand);border-color:var(--brand);color:var(--on)}
+.btn.big{width:100%;font:700 26px var(--d);padding:22px}
+.btn:disabled{opacity:.5}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.chip{font:inherit;font-size:16px;border:2px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--brand);border-color:var(--brand);color:var(--on)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:14px}
+.en{font:700 28px/1.25 var(--d)}
+.es{color:var(--mute);margin-top:4px}
+.bar{height:8px;background:var(--line);border-radius:8px;margin-bottom:20px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--brand)}
+.opt{display:block;width:100%;text-align:left;margin-bottom:10px}
+.opt.ok,.fb.ok{background:var(--okbg);border-color:var(--ok);color:var(--ok)}
+.opt.bad,.fb.bad{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+.fb{border:2px solid;border-radius:14px;padding:12px 16px;margin:12px 0}
+.ans{min-height:58px;border-bottom:2px solid var(--line);margin:14px 0;display:flex;flex-wrap:wrap;gap:8px;padding-bottom:8px}
+.w{font:600 20px var(--b);border:2px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:6px 12px;cursor:pointer}
+.sw{padding:0 2px;border-radius:6px}.sw.g{background:var(--okbg);color:var(--ok)}.sw.n{box-shadow:0 3px 0 var(--brand)}
+.back{background:none;border:0;color:var(--mute);font:inherit;cursor:pointer;padding:0;margin-bottom:12px}
+.li{padding:10px 0;border-bottom:1px solid var(--line)}
+.tiny{color:var(--mute);font-size:15px}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--panel);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+.nav button{flex:1;font:600 14px var(--b);background:none;border:0;color:var(--mute);padding:6px 2px;cursor:pointer;border-radius:10px}
+.nav button b{display:block;font-size:20px;font-weight:400}
+.nav button[aria-current=page]{color:var(--brand)}
+.mode{display:block;width:100%;text-align:left;margin-bottom:10px}
+.mode b{display:block;font:700 20px var(--d)}
+.mode span{color:var(--mute);font-size:15px;font-weight:400}
+.search{width:100%;padding:14px;border-radius:14px;border:2px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;margin-bottom:16px;}
+.search:focus{outline:none;border-color:var(--brand);}
+.heatmap{display:grid;grid-template-columns:repeat(10, 1fr);gap:4px;margin-top:10px;margin-bottom:20px;}
+.hm-cell{aspect-ratio:1;border-radius:4px;background:var(--line);}
+.hm-cell.done{background:var(--brand);}
+.video-container{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:14px;margin-bottom:20px;background:#000;}
+.video-container iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<nav class="nav" id="nav" hidden aria-label="Secciones"></nav>
+
+<script>
+window.mkPack = (id, lv, title, rows) => ({ id, lv, title, items: rows.map((r, i) => {
+  const k = id + "-" + i;
+  if (r[0] === "#") { const [t, x] = r.slice(1).split("|"); return { id: k, t: "g", title: t, text: x }; }
+  if (r[0] === "!") { const [w, ok, y] = r.slice(1).split("|"); return { id: k, t: "f", wrong: w, right: ok, why: y }; }
+  const [en, es] = r.split("|"); return { id: k, t: "p", en, es };
+}) });
+</script>
+
+<script src="content/a1-basico.js"></script>
+<script src="content/a1-personas.js"></script>
+<script src="content/a1-comida.js"></script>
+<script src="content/a1-calle.js"></script>
+<script src="content/a1-dia.js"></script>
+<script src="content/a1-salud.js"></script>
+<script src="songs.js"></script>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const PK = window.PACKS || [];
+const ITEMS = PK.flatMap(p => p.items);
+const KEY = "ingles_v1", INT = [0, 1, 3, 7, 16, 35];
+const ACC = { "en-US": "🇺🇸 EE. UU.", "en-GB": "🇬🇧 Reino Unido", "en-AU": "🇦🇺 Australia", "en-IN": "🇮🇳 India" };
+let S = {};
+try { S = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) {}
+S = Object.assign({ items: {}, days: [], accent: "en-US" }, S);
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+const day = () => { const d = new Date(); return Math.floor((d.getTime() - d.getTimezoneOffset() * 6e4) / 864e5); };
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const norm = s => s.toLowerCase().replace(/’/g, "'").replace(/[^a-z' ]/g, "").replace(/\s+/g, " ").trim();
+const words = s => norm(s).split(" ").filter(Boolean);
+
+function h(t, a = {}, ...c) {
+  const e = document.createElement(t);
+  for (const k in a) { if (a[k] == null) continue; if (k.startsWith("on")) e[k] = a[k]; else if (k === "class") e.className = a[k]; else e.setAttribute(k, a[k]); }
+  c.flat().forEach(x => { if (x != null && x !== false) e.append(x); });
+  return e;
+}
+const show = (...n) => { synth && synth.cancel(); $("#nav").hidden = true; $("#app").replaceChildren(...n.flat().filter(x => x != null && x !== false)); window.scrollTo(0, 0); };
+const TABS = [["hoy", "🏠", "Hoy", () => home()], ["practicar", "🎯", "Practicar", () => practica()], ["aprender", "📖", "Aprender", () => aprender()], ["musica", "🎵", "Música", () => musica()], ["yo", "👤", "Yo", () => yo()]];
+function root(tab, ...n) {
+  show(...n);
+  const nav = $("#nav"); nav.hidden = false;
+  nav.replaceChildren(...TABS.map(([k, ic, lb, fn]) => h("button", { "aria-current": k === tab ? "page" : null, onclick: fn }, h("b", {}, ic), lb)));
+}
+
+const synth = window.speechSynthesis; let voices = [];
+if (synth) { voices = synth.getVoices(); synth.onvoiceschanged = () => voices = synth.getVoices(); }
+function say(t, rate = 1) {
+  return new Promise(r => {
+    if (!synth) return r();
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(t), v = voices.find(v => v.lang.replace("_", "-") === S.accent);
+    if (v) u.voice = v;
+    u.lang = S.accent; u.rate = rate; u.onend = u.onerror = r; synth.speak(u);
+  });
+}
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const speakBtn = t => [h("button", { class: "btn", "aria-label": "Escuchar", onclick: () => say(t) }, "🔊 Escuchar"),
+  h("button", { class: "btn", "aria-label": "Escuchar despacio", onclick: () => say(t, 0.7) }, "🐢 Despacio")];
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if ($("#nav button[aria-current=page]")?.textContent.includes("Yo")) yo();
+});
+
+function streak() {
+  const t = day(), d = S.days.slice().sort((a, b) => b - a);
+  if (!d.length || d[0] < t - 1) return 0;
+  let n = 1;
+  for (let i = 1; i < d.length; i++) { if (d[i - 1] - d[i] <= 2) n++; else break; }
+  return n;
+}
+function grade(it, ok) {
+  const st = S.items[it.id] || { b: 0, m: 0 }, t = day();
+  if (ok) { st.b = Math.min(5, st.b + 1); st.due = t + INT[st.b]; }
+  else { st.b = Math.max(0, st.b - 1); st.due = t; st.m = (st.m || 0) + 1; }
+  S.items[it.id] = st; save();
+}
+function build() {
+  const t = day();
+  const due = ITEMS.filter(i => S.items[i.id] && S.items[i.id].due <= t)
+    .sort((a, b) => (S.items[b.id].m || 0) - (S.items[a.id].m || 0)).slice(0, 6);
+  const fresh = []; let n = 0;
+  for (const i of ITEMS) {
+    if (S.items[i.id]) continue;
+    if (i.t === "g") { fresh.push(i); continue; }
+    if (n < 3) { fresh.push(i); n++; } else break;
+  }
+  return [...fresh.map(i => ({ i, learn: true })), ...shuffle(due).map(i => ({ i }))];
+}
+
+function home() {
+  const t = day(), due = ITEMS.filter(i => S.items[i.id] && S.items[i.id].due <= t).length;
+  const fresh = Math.min(3, ITEMS.filter(i => !S.items[i.id] && i.t !== "g").length);
+  const nothing = !due && !fresh;
+  root("hoy",
+    h("h1", {}, "Hoy"),
+    h("p", { class: "sub" }, nothing ? "Todo al día. Vuelve mañana." : "Una sesión corta. Tú solo pulsas el botón."),
+    h("div", { class: "stats" }, st(due, "por repasar"), st(fresh, "nuevas"), st(streak(), "días seguidos")),
+    h("button", { class: "btn main big", disabled: nothing ? "" : null, onclick: start }, "Empezar"),
+    h("button", { class: "btn big", style: "margin-top:12px;font-size:20px;padding:16px", onclick: nothing ? practica : startQuick }, nothing ? "Practicar más" : "Modo rápido (2 min)"));
+}
+const st = (n, l) => h("div", { class: "st" }, h("b", {}, String(n)), h("span", {}, l));
+
+let Q = [], qi = 0, R = { ok: 0, bad: 0 }, FROM = home;
+function start() {
+  Q = build(); qi = 0; R = { ok: 0, bad: 0 }; FROM = home;
+  if (!Q.length) return home();
+  next();
+}
+function startQuick() {
+  const t = day();
+  let src = ITEMS.filter(i => i.t !== "g" && S.items[i.id] && S.items[i.id].due <= t);
+  if (!src.length) src = ITEMS.filter(i => i.t !== "g" && S.items[i.id]);
+  Q = shuffle(src).slice(0, 4).map(i => ({ i })); qi = 0; R = { ok: 0, bad: 0 }; FROM = home;
+  if (!Q.length) return start();
+  next();
+}
+const hdr = () => h("div", {}, h("button", { class: "back", onclick: () => FROM() }, "← Salir"),
+  h("div", { class: "bar" }, h("i", { style: `width:${Math.round(100 * qi / Q.length)}%` })));
+function next() { if (qi >= Q.length) return (Q[0] && Q[0].free) ? FROM() : finish(); const q = Q[qi]; q.learn ? learn(q) : ex(q); }
+
+function learn(q) {
+  const it = q.i;
+  if (it.t === "g") {
+    show(hdr(), h("h2", {}, "Regla rápida"),
+      h("div", { class: "card" }, h("div", { class: "en", style: "font-size:22px" }, it.title), h("p", {}, it.text)),
+      h("button", { class: "btn main big", onclick: () => { S.items[it.id] = { b: 5, m: 0, due: day() + 99999 }; save(); qi++; next(); } }, "Entendido"));
+    return;
+  }
+  const body = it.t === "p"
+    ? [h("div", { class: "en" }, it.en), h("div", { class: "es" }, it.es), h("div", { class: "row" }, speakBtn(it.en))]
+    : [h("div", { class: "es" }, "Error típico"), h("div", { class: "en", style: "color:var(--bad);text-decoration:line-through" }, it.wrong),
+       h("div", { class: "en", style: "color:var(--ok)" }, it.right), h("p", {}, it.why), h("div", { class: "row" }, speakBtn(it.right))];
+  show(hdr(), h("h2", {}, "Nuevo"), h("div", { class: "card" }, body),
+    h("button", { class: "btn main big", onclick: () => { q.learn = false; ex(q); } }, "Practicar"));
+  if (it.t === "p") say(it.en); else say(it.right);
+}
+function ex(q) {
+  const it = q.i, b = (S.items[it.id] || { b: 0 }).b;
+  if (q.mode) return ({ hablar: () => SR ? speak(q) : order(q), escuchar: listen, ordenar: order, rellenar: cloze, dictado: dictar }[q.mode] || order)(q);
+  if (it.t === "f") return fix(q);
+  if (b < 2) return listen(q);
+  if (b < 4 || !SR) return order(q);
+  speak(q);
+}
+function done(q, ok, extra) {
+  if (navigator.vibrate) navigator.vibrate(ok ? 40 : [50, 50, 50]);
+  if (!q.free) grade(q.i, ok); ok ? R.ok++ : R.bad++;
+  if (!ok && !q.retry && !q.free) Q.push({ i: q.i, retry: true, mode: q.mode });
+  const fb = h("div", { class: "fb " + (ok ? "ok" : "bad") }, h("b", {}, ok ? "¡Bien!" : "Casi."), " ", extra || "");
+  $("#app").append(fb, h("button", { class: "btn main big", onclick: () => { qi++; next(); } }, "Siguiente"));
+  fb.scrollIntoView({ block: "nearest" });
+}
+
+function listen(q) {
+  const it = q.i, pool = ITEMS.filter(x => x.t === "p" && x.id !== it.id);
+  const opts = shuffle([it, ...shuffle(pool).slice(0, 2)]);
+  const box = h("div", {});
+  opts.forEach(o => box.append(h("button", { class: "btn opt", onclick: e => {
+    box.querySelectorAll("button").forEach(b => b.disabled = true);
+    const ok = o.id === it.id;
+    e.target.classList.add(ok ? "ok" : "bad");
+    if (!ok) [...box.children][opts.indexOf(it)].classList.add("ok");
+    done(q, ok, it.en);
+  } }, o.es)));
+  show(hdr(), h("h2", {}, "¿Qué significa?"), h("div", { class: "row" }, speakBtn(it.en)), box);
+  say(it.en);
+}
+
+function order(q) {
+  const it = q.i, target = it.en.split(" "), bank = shuffle(target.map((w, i) => ({ w, i })));
+  let pick = [];
+  const ans = h("div", { class: "ans" }), pool = h("div", { class: "row" }), chk = h("button", { class: "btn main big", disabled: "" }, "Comprobar");
+  const draw = () => {
+    ans.replaceChildren(...pick.map(p => h("button", { class: "w", onclick: () => { pick = pick.filter(x => x !== p); draw(); } }, p.w)));
+    pool.replaceChildren(...bank.filter(b => !pick.includes(b)).map(b => h("button", { class: "w", onclick: () => { pick.push(b); draw(); } }, b.w)));
+    chk.disabled = pick.length !== bank.length;
+  };
+  chk.onclick = () => {
+    chk.remove(); pool.remove();
+    const ok = norm(pick.map(p => p.w).join(" ")) === norm(it.en);
+    ans.querySelectorAll("button").forEach(b => b.disabled = true);
+    say(it.en); done(q, ok, it.en);
+  };
+  show(hdr(), h("h2", {}, "Dilo en inglés"), h("div", { class: "card" }, h("div", { class: "es", style: "font-size:22px;color:var(--ink)" }, it.es)), ans, pool, chk);
+  draw();
+}
+
+function speak(q) {
+  const it = q.i, tw = words(it.en), ok = tw.map(() => false);
+  let rec = null, stopping = false, base = "", last = "", fatal = false;
+  const line = h("div", { class: "en" }), btn = h("button", { class: "btn main big" }, "Hablar");
+  const spans = it.en.split(" ").map((w, i) => h("span", { class: "sw" }, w + " "));
+  line.append(...spans);
+  const paint = () => { const n = ok.indexOf(false); spans.forEach((s, i) => { s.className = "sw" + (ok[i] ? " g" : i === n && rec ? " n" : ""); }); };
+  const track = txt => {
+    let p = 0;
+    for (const w of words(txt)) { for (let j = p; j < Math.min(p + 3, tw.length); j++) if (w === tw[j]) { ok[j] = true; p = j + 1; break; } if (p >= tw.length) break; }
+    paint(); if (p >= tw.length && rec) { stopping = true; rec.stop(); }
+  };
+  const finishIt = () => { rec = null; btn.remove(); skip.remove(); const n = ok.filter(Boolean).length; done(q, n >= Math.ceil(tw.length * .8), it.en); };
+  const skip = h("button", { class: "btn", style: "margin-top:10px", onclick: () => { if (rec) { stopping = true; rec.abort(); } q.i = it; order(q); } }, "No puedo hablar ahora");
+  btn.onclick = () => {
+    if (rec) { stopping = true; rec.stop(); return; }
+    { const m = $("#micmsg"); if (m) m.remove(); } fatal = false; stopping = false; base = ""; last = ""; ok.fill(false); rec = new SR(); rec.lang = S.accent; rec.continuous = true; rec.interimResults = true;
+    rec.onresult = e => { last = (base + " " + Array.from(e.results).map(r => r[0].transcript).join(" ")).trim(); track(last); };
+    rec.onend = () => { if (fatal) { rec = null; btn.textContent = "Hablar"; paint(); return; } if (!stopping) { base = last; try { rec.start(); return; } catch (e) {} } finishIt(); };
+    rec.onerror = e => {
+    const msg = { "not-allowed": "Permite el micrófono en el navegador para hablar.", "service-not-allowed": "Permite el micrófono en el navegador para hablar.", "network": "El reconocimiento de voz necesita internet.", "audio-capture": "No encuentro un micrófono." }[e.error];
+    if (msg) { fatal = true; stopping = true; if (!$("#micmsg")) $("#app").append(h("p", { id: "micmsg", class: "fb bad" }, msg)); }
+  };
+    btn.textContent = "Terminar"; paint(); rec.start();
+  };
+  show(hdr(), h("h2", {}, "Dilo en voz alta"), h("div", { class: "card" }, h("div", { class: "es", style: "font-size:22px;color:var(--ink);margin-bottom:10px" }, it.es), line), btn, skip);
+}
+
+function cloze(q) {
+  const it = q.i, toks = it.en.split(" ");
+  const cand = toks.map((w, i) => i).filter(i => words(toks[i]).length && words(toks[i])[0].length >= 3);
+  const idx = cand.length ? cand[Math.random() * cand.length | 0] : 0;
+  const right = words(toks[idx])[0] || toks[idx].toLowerCase();
+  const others = [...new Set(ITEMS.filter(x => x.t === "p" && x.id !== it.id).flatMap(x => words(x.en)).filter(w => w.length >= 3 && w !== right))];
+  const opts = shuffle([right, ...shuffle(others).slice(0, 2)]);
+  const shown = toks.map((w, i) => i === idx ? w.replace(/[A-Za-z’']+/, "_____") : w).join(" ");
+  const box = h("div", {});
+  opts.forEach(o => box.append(h("button", { class: "btn opt", onclick: e => {
+    box.querySelectorAll("button").forEach(b => b.disabled = true);
+    const ok = o === right;
+    e.target.classList.add(ok ? "ok" : "bad");
+    if (!ok) [...box.children][opts.indexOf(right)].classList.add("ok");
+    say(it.en); done(q, ok, it.en);
+  } }, o)));
+  show(hdr(), h("h2", {}, "Completa la frase"), h("div", { class: "card" }, h("div", { class: "en" }, shown), h("div", { class: "es" }, it.es)), box);
+}
+function dictar(q) {
+  const it = q.i, inp = h("input", { type: "text", class: "search", placeholder: "Escribe lo que oyes…", autocomplete: "off", autocapitalize: "none", spellcheck: "false" });
+  const chk = h("button", { class: "btn main big", onclick: () => { chk.remove(); inp.disabled = true; done(q, norm(inp.value) === norm(it.en), it.en); } }, "Comprobar");
+  show(hdr(), h("h2", {}, "Dictado"), h("p", { class: "sub" }, "Escucha y escribe la frase en inglés."), h("div", { class: "row" }, speakBtn(it.en)), inp, chk);
+  say(it.en);
+}
+function fix(q) {
+  const it = q.i, opts = shuffle([it.wrong, it.right]), box = h("div", {});
+  opts.forEach(o => box.append(h("button", { class: "btn opt", onclick: e => {
+    box.querySelectorAll("button").forEach(b => b.disabled = true);
+    const ok = o === it.right;
+    e.target.classList.add(ok ? "ok" : "bad");
+    if (!ok) [...box.children][opts.indexOf(it.right)].classList.add("ok");
+    say(it.right); done(q, ok, it.why);
+  } }, o)));
+  show(hdr(), h("h2", {}, "¿Cuál es correcta?"), box);
+}
+
+function finish() {
+  const t = day(); if (!S.days.includes(t)) S.days.push(t); save();
+  const tot = R.ok + R.bad;
+  show(h("h1", {}, "Listo"), h("p", { class: "sub" }, `${R.ok} de ${tot} bien. ${streak()} días seguidos.`),
+    R.bad ? h("p", {}, "Lo que fallaste volverá a aparecer pronto.") : h("p", {}, "Sin errores hoy."),
+    h("button", { class: "btn main big", onclick: () => FROM() }, "Terminar"));
+}
+
+let SEL = "todos";
+const pool = sel => ITEMS.filter(i => i.t === "p" && (sel === "todos" || (PK.find(p => p.id === sel) || { items: [] }).items.includes(i)));
+function practica() {
+  const n = pool(SEL).length;
+  const modes = [["hablar", "🎤", "Hablar", "Dices la frase y las palabras se ponen en verde"], ["escuchar", "👂", "Escuchar", "Oyes la frase y eliges su significado"], ["ordenar", "🧩", "Ordenar", "Armas la frase en inglés con palabras sueltas"], ["rellenar", "✏️", "Rellenar", "Completas la palabra que falta"], ["dictado", "⌨️", "Dictado", "Escuchas y escribes lo que oyes"]];
+  root("practicar", h("h1", { style: "font-size:40px" }, "Practicar"), h("p", { class: "sub" }, "Elige un tema y un modo. Son 10 ejercicios, sin prisa."),
+    h("div", { class: "row" }, [["todos", "Todos"], ...PK.map(p => [p.id, p.title])].map(([k, l]) =>
+      h("button", { class: "chip", "aria-pressed": String(SEL === k), onclick: () => { SEL = k; practica(); } }, l))),
+    modes.map(([k, ic, t, d]) => h("button", { class: "btn mode", disabled: (n < 3 || (k === "hablar" && !SR)) ? "" : null, onclick: () => startMode(k) },
+      h("b", {}, ic + " " + t), h("span", {}, k === "hablar" && !SR ? "Tu navegador no admite voz. Usa Chrome o Edge." : d))));
+}
+function startMode(k) {
+  Q = shuffle(pool(SEL)).slice(0, 10).map(i => ({ i, mode: k })); qi = 0; R = { ok: 0, bad: 0 }; FROM = practica;
+  if (!Q.length) return practica();
+  next();
+}
+
+function aprender() {
+  const searchWrap = h("input", { type: "search", class: "search", placeholder: "🔍 Buscar frase, palabra o regla...", oninput: (e) => filterLearn(e.target.value) });
+  const listWrap = h("div", { id: "learn-list" });
+  root("aprender", h("h1", { style: "font-size:40px" }, "Aprender"), h("p", { class: "sub" }, "Repasa reglas y frases por tema, sin examen."), searchWrap, listWrap);
+  filterLearn("");
+}
+function filterLearn(q) {
+  const list = $("#learn-list");
+  if (!list) return;
+  q = q.toLowerCase().trim();
+  if (!q) {
+    list.replaceChildren(...PK.map(p => h("button", { class: "btn mode", onclick: () => packView(p) }, h("b", {}, p.title), h("span", {}, `${p.items.filter(i => i.t === "p").length} frases y ${p.items.filter(i => i.t === "f").length} errores típicos`))));
+    return;
+  }
+  const results = ITEMS.filter(i => {
+    const text = (i.t === "p" ? i.en + " " + i.es : i.t === "f" ? i.wrong + " " + i.right + " " + i.why : i.title + " " + i.text).toLowerCase();
+    return text.includes(q);
+  });
+  if (!results.length) return list.replaceChildren(h("p", { class: "sub" }, "No se encontraron resultados."));
+  list.replaceChildren(...results.slice(0, 50).map(i => 
+    i.t === "g" ? h("div", { class: "card" }, h("b", {}, "Regla: " + i.title), h("p", {}, i.text))
+    : i.t === "f" ? h("div", { class: "li" }, h("div", { class: "tiny", style: "text-decoration:line-through" }, i.wrong), h("div", { class: "en", style: "font-size:20px" }, i.right), h("div", { class: "tiny" }, i.why))
+    : h("div", { class: "li", style: "cursor:pointer", onclick: () => say(i.en) }, h("div", { class: "en", style: "font-size:20px" }, "🔊 " + i.en), h("div", { class: "tiny" }, i.es))
+  ));
+}
+function packView(p) {
+  root("aprender", h("button", { class: "back", onclick: aprender }, "← Temas"), h("h2", {}, p.title),
+    p.items.map(i => i.t === "g" ? h("div", { class: "card" }, h("b", {}, "Regla: " + i.title), h("p", {}, i.text))
+      : i.t === "f" ? h("div", { class: "li" }, h("div", { class: "tiny", style: "text-decoration:line-through" }, i.wrong), h("div", { class: "en", style: "font-size:20px" }, i.right), h("div", { class: "tiny" }, i.why))
+      : h("div", { class: "li", style: "cursor:pointer", onclick: () => say(i.en) }, h("div", { class: "en", style: "font-size:20px" }, "🔊 " + i.en), h("div", { class: "tiny" }, i.es))));
+}
+
+const ytId = u => { const m = String(u).match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/); return m ? m[1] : /^[\w-]{11}$/.test(String(u).trim()) ? String(u).trim() : null; };
+function musica() {
+  const SG = [...(window.SONGS || []), ...(S.mySongs || [])];
+  root("musica", h("h1", { style: "font-size:40px" }, "Música"),
+    h("p", { class: "sub" }, "Aprende con canciones y videos. Toca una línea para oírla o practicarla."),
+    SG.map(s => h("button", { class: "btn mode", onclick: () => songView(s) }, h("b", {}, "🎵 " + s.title), h("span", {}, s.artist || "Mi video"))),
+    h("button", { class: "btn main", style: "width:100%", onclick: addSong }, "＋ Agregar canción o video"));
+}
+function addSong() {
+  const t = h("input", { class: "search", placeholder: "Título" }), u = h("input", { class: "search", placeholder: "Enlace de YouTube" }),
+    l = h("textarea", { class: "search", rows: "6", placeholder: "Letra o transcripción en inglés, una línea por renglón (opcional). Se guarda solo en tu dispositivo." }), msg = h("p", { class: "tiny" });
+  root("musica", h("button", { class: "back", onclick: musica }, "← Canciones"), h("h2", {}, "Agregar"), t, u, l, msg,
+    h("button", { class: "btn main big", onclick: () => {
+      const id = ytId(u.value);
+      if (!t.value.trim() || !id) { msg.textContent = "Escribe un título y un enlace de YouTube válido."; return; }
+      (S.mySongs = S.mySongs || []).push({ id: "m" + Date.now(), title: t.value.trim(), yt: id, mine: true, lines: l.value.split("\n").map(x => x.trim()).filter(Boolean) });
+      save(); musica();
+    } }, "Guardar"));
+}
+function songView(s) {
+  const url = `https://www.youtube.com/watch?v=${s.yt}`;
+  const player = location.protocol === "file:"
+    ? h("div", { class: "card" }, h("p", {}, "YouTube no reproduce videos dentro de un archivo abierto desde tu disco (error 153). Publica la app en https o ábrela desde localhost. Mientras tanto, ábrelo en YouTube."))
+    : h("div", { class: "video-container" }, h("iframe", { src: `https://www.youtube-nocookie.com/embed/${s.yt}?rel=0&playsinline=1`, title: s.title, loading: "lazy",
+        allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture", referrerpolicy: "strict-origin-when-cross-origin", allowfullscreen: "" }));
+  const lines = s.lyrics || (s.lines || []).map(en => ({ en }));
+  const practice = en => { Q = [{ i: { id: "~l", t: "p", en, es: "" }, mode: "hablar", free: true }]; qi = 0; R = { ok: 0, bad: 0 }; FROM = () => songView(s); next(); };
+  const rows = lines.map(l => h("div", { class: "li" },
+    h("div", { style: "cursor:pointer", onclick: () => say(l.en) }, h("div", { class: "en", style: "font-size:20px;color:var(--brand)" }, "🔊 " + l.en), l.es ? h("div", { class: "tiny" }, l.es) : null),
+    SR ? h("button", { class: "chip", style: "margin-top:6px", onclick: () => practice(l.en) }, "🎤 Repetir") : null));
+  root("musica", h("button", { class: "back", onclick: musica }, "← Canciones"), h("h2", {}, s.title), h("p", { class: "sub" }, s.artist || ""), player,
+    h("p", {}, h("a", { href: url, target: "_blank", rel: "noopener", style: "color:var(--brand)" }, "Abrir en YouTube")),
+    rows.length ? h("div", {}, rows) : h("p", { class: "tiny" }, "Sin letra todavía."),
+    s.mine ? h("button", { class: "btn", style: "margin-top:14px", onclick: () => { if (confirm("¿Quitar este video?")) { S.mySongs = S.mySongs.filter(x => x.id !== s.id); save(); musica(); } } }, "Quitar") : null);
+}
+
+function renderHeatmap() {
+  const t = day(); const days = [];
+  for (let i = 29; i >= 0; i--) days.push(t - i);
+  return h("div", { class: "heatmap" }, days.map(d => {
+    const done = S.days.includes(d);
+    const str = new Date(d * 864e5).toLocaleDateString('es-ES', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+    return h("div", { class: "hm-cell" + (done ? " done" : ""), title: str + (done ? " (completado)" : "") });
+  }));
+}
+function yo() {
+  const seen = Object.keys(S.items).length, errs = Object.values(S.items).filter(x => x.m).length;
+  const installBtn = deferredPrompt ? h("button", { class: "btn main", style: "width:100%; margin-bottom:20px; padding:16px;", onclick: async () => {
+      deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') deferredPrompt = null; yo();
+    } }, "📲 Instalar App en mi móvil") : null;
+  root("yo", h("h1", { style: "font-size:40px" }, "Yo"), installBtn, h("div", { class: "stats" }, st(streak(), "días seguidos"), st(seen, "vistas"), st(errs, "con errores")),
+    h("h2", { style: "font-size:20px; margin-top:10px;" }, "Últimos 30 días"), renderHeatmap(), h("p", { class: "tiny" }, "Acento"),
+    h("div", { class: "row" }, Object.entries(ACC).map(([k, v]) => h("button", { class: "chip", "aria-pressed": String(S.accent === k), onclick: () => { S.accent = k; save(); yo(); } }, v))),
+    h("div", { class: "row" }, h("button", { class: "btn", onclick: errors }, "Mis errores"), h("button", { class: "btn", onclick: backup }, "Respaldo")));
+}
+function errors() {
+  const list = ITEMS.filter(i => (S.items[i.id] || {}).m).sort((a, b) => S.items[b.id].m - S.items[a.id].m);
+  root("yo", h("button", { class: "back", onclick: yo }, "← Volver"), h("h2", {}, "Mis errores"),
+    list.length ? list.map(i => h("div", { class: "li" }, h("div", { class: "en", style: "font-size:20px" }, i.t === "p" ? i.en : i.right), h("div", { class: "tiny" }, `${i.t === "p" ? i.es : i.why} (fallos: ${S.items[i.id].m})`))) : h("p", { class: "sub" }, "Aún no hay errores."));
+}
+function backup() {
+  const inp = h("input", { type: "file", accept: "application/json", style: "display:none", onchange: e => {
+    const f = e.target.files[0]; if (!f) return;
+    f.text().then(t => { try { S = Object.assign({ items: {}, days: [], accent: "en-US" }, JSON.parse(t)); save(); yo(); } catch (x) { alert("Archivo no válido."); } });
+  } });
+  root("yo", h("button", { class: "back", onclick: yo }, "← Volver"), h("h2", {}, "Respaldo"), h("p", {}, "Guarda o carga tu progreso."),
+    h("div", { class: "row" }, h("button", { class: "btn main", onclick: () => {
+        const a = h("a", { href: URL.createObjectURL(new Blob([JSON.stringify(S)], { type: "application/json" })), download: "progreso-ingles.json" }); a.click();
+      } }, "Guardar progreso"), h("button", { class: "btn", onclick: () => inp.click() }, "Cargar progreso"), inp));
+}
+
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js");
+home();
+</script>
+</body>
+</html>

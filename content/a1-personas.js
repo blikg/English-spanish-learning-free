@@ -1,0 +1,33 @@
+/* Formato compacto: "en|es" = frase, "!incorrecta|correcta|por qué" = error típico, "#título|texto" = regla. */
+window.PACKS = window.PACKS || [];
+window.PACKS.push(mkPack("a1-personas", "A1", "Hablar de ti", [
+  "#Verbo to be|Se usa I am, you are, he/she/it is, we/you/they are. En inglés el sujeto es obligatorio: “I am tired”, no “Am tired”.",
+  "My name is Carlos.|Mi nombre es Carlos.",
+  "I’m twenty-five years old.|Tengo veinticinco años.",
+  "I live in Santiago.|Vivo en Santiago.",
+  "I work in an office.|Trabajo en una oficina.",
+  "!Am tired.|I am tired.|En inglés el sujeto es obligatorio: “I am”.",
+  "I’m a student.|Soy estudiante.",
+  "This is my sister.|Ella es mi hermana.",
+  "I have two brothers.|Tengo dos hermanos.",
+  "My mother is a teacher.|Mi madre es profesora.",
+  "!I am 25 years.|I am 25 years old.|Falta “old”: la edad es “years old”.",
+  "We are friends.|Somos amigos.",
+  "He is my husband.|Él es mi esposo.",
+  "She is very kind.|Ella es muy amable.",
+  "They are from Peru.|Ellos son de Perú.",
+  "!My sister have two kids.|My sister has two kids.|Con he, she e it se usa “has”.",
+  "Do you speak English?|¿Hablas inglés?",
+  "I speak a little English.|Hablo un poco de inglés.",
+  "What do you do?|¿A qué te dedicas?",
+  "I’m tired today.|Hoy estoy cansado.",
+  "!I am work in an office.|I work in an office.|Con un verbo de acción no se usa “am”.",
+  "I’m happy to be here.|Estoy feliz de estar aquí.",
+  "What’s your phone number?|¿Cuál es tu número de teléfono?",
+  "My birthday is in May.|Mi cumpleaños es en mayo.",
+  "I like music.|Me gusta la música.",
+  "I don’t like cold weather.|No me gusta el clima frío.",
+  "Do you have any children?|¿Tienes hijos?",
+  "I’m single.|Estoy soltero.",
+  "Let me introduce my friend.|Déjame presentarte a mi amigo."
+]));
