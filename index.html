@@ -14,12 +14,7 @@
 --d:"Familjen Grotesk",system-ui,sans-serif;--b:"Source Sans 3",system-ui,sans-serif}
 @media(prefers-color-scheme:dark){:root{--bg:#121a2b;--panel:#1b263d;--ink:#e8eefc;--mute:#9db0d0;--line:#2e3c5a;--brand:#7d92ff;--on:#0d1530;--ok:#5fd9a6;--okbg:#17372f;--bad:#ff8fa3;--badbg:#40212b}}
 *{box-sizing:border-box}
-body{
-  margin:0;background:var(--bg);color:var(--ink);font:400 18px/1.5 var(--b);
-  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
-  -webkit-tap-highlight-color: transparent;
-  overscroll-behavior-y: none;
-}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 18px/1.5 var(--b);padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
 main{max-width:560px;margin:0 auto;padding:24px 18px 100px}
 h1{font:700 clamp(40px,12vw,64px)/1 var(--d);margin:0 0 6px;letter-spacing:-.02em}
 h2{font:700 24px var(--d);margin:0 0 10px}
@@ -52,19 +47,26 @@ h2{font:700 24px var(--d);margin:0 0 10px}
 .tiny{color:var(--mute);font-size:15px}
 :focus-visible{outline:3px solid var(--brand);outline-offset:2px}
 .nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--panel);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
-.nav button{flex:1;font:600 14px var(--b);background:none;border:0;color:var(--mute);padding:6px 2px;cursor:pointer;border-radius:10px}
+.nav button{flex:1;font:600 13px var(--b);background:none;border:0;color:var(--mute);padding:6px 2px;cursor:pointer;border-radius:10px}
 .nav button b{display:block;font-size:20px;font-weight:400}
 .nav button[aria-current=page]{color:var(--brand)}
 .mode{display:block;width:100%;text-align:left;margin-bottom:10px}
 .mode b{display:block;font:700 20px var(--d)}
 .mode span{color:var(--mute);font-size:15px;font-weight:400}
-.search{width:100%;padding:14px;border-radius:14px;border:2px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;margin-bottom:16px;}
-.search:focus{outline:none;border-color:var(--brand);}
-.heatmap{display:grid;grid-template-columns:repeat(10, 1fr);gap:4px;margin-top:10px;margin-bottom:20px;}
-.hm-cell{aspect-ratio:1;border-radius:4px;background:var(--line);}
-.hm-cell.done{background:var(--brand);}
-.video-container{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:14px;margin-bottom:20px;background:#000;}
-.video-container iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;}
+.search{width:100%;padding:14px;border-radius:14px;border:2px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;margin-bottom:12px}
+.search:focus{outline:none;border-color:var(--brand)}
+.heatmap{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin:10px 0 20px}
+.hm-cell{aspect-ratio:1;border-radius:4px;background:var(--line)}.hm-cell.done{background:var(--brand)}
+.video-container{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:14px;background:#000}
+.video-container iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+.sticky{position:sticky;top:0;z-index:3;background:var(--bg);padding:6px 0 4px}
+.ctl{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.cue{padding:10px 10px;border-radius:12px;cursor:pointer;transition:background .2s}
+.cue .tm{color:var(--mute);font-size:13px}
+.cue .tx{font:700 20px/1.3 var(--d);transition:filter .25s,opacity .25s}
+.cue.cur{background:var(--okbg)}.cue.cur .tx{color:var(--ok)}
+.cue.past .tx{color:var(--mute)}
+.cue.fut.hide .tx{filter:blur(7px);opacity:.35}
 </style>
 </head>
 <body>
@@ -72,6 +74,7 @@ h2{font:700 24px var(--d);margin:0 0 10px}
 <nav class="nav" id="nav" hidden aria-label="Secciones"></nav>
 
 <script>
+/* Formato compacto de paquetes: "en|es" frase, "!mal|bien|por qué" error típico, "#título|texto" regla */
 window.mkPack = (id, lv, title, rows) => ({ id, lv, title, items: rows.map((r, i) => {
   const k = id + "-" + i;
   if (r[0] === "#") { const [t, x] = r.slice(1).split("|"); return { id: k, t: "g", title: t, text: x }; }
@@ -79,7 +82,6 @@ window.mkPack = (id, lv, title, rows) => ({ id, lv, title, items: rows.map((r, i
   const [en, es] = r.split("|"); return { id: k, t: "p", en, es };
 }) });
 </script>
-
 <script src="content/a1-basico.js"></script>
 <script src="content/a1-personas.js"></script>
 <script src="content/a1-comida.js"></script>
@@ -91,8 +93,7 @@ window.mkPack = (id, lv, title, rows) => ({ id, lv, title, items: rows.map((r, i
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
-const PK = window.PACKS || [];
-const ITEMS = PK.flatMap(p => p.items);
+const PK = window.PACKS || [], ITEMS = PK.flatMap(p => p.items);
 const KEY = "ingles_v1", INT = [0, 1, 3, 7, 16, 35];
 const ACC = { "en-US": "🇺🇸 EE. UU.", "en-GB": "🇬🇧 Reino Unido", "en-AU": "🇦🇺 Australia", "en-IN": "🇮🇳 India" };
 let S = {};
@@ -103,6 +104,7 @@ const day = () => { const d = new Date(); return Math.floor((d.getTime() - d.get
 const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const norm = s => s.toLowerCase().replace(/’/g, "'").replace(/[^a-z' ]/g, "").replace(/\s+/g, " ").trim();
 const words = s => norm(s).split(" ").filter(Boolean);
+const seenOf = i => S.items[i.id];
 
 function h(t, a = {}, ...c) {
   const e = document.createElement(t);
@@ -110,14 +112,9 @@ function h(t, a = {}, ...c) {
   c.flat().forEach(x => { if (x != null && x !== false) e.append(x); });
   return e;
 }
-const show = (...n) => { synth && synth.cancel(); $("#nav").hidden = true; $("#app").replaceChildren(...n.flat().filter(x => x != null && x !== false)); window.scrollTo(0, 0); };
-const TABS = [["hoy", "🏠", "Hoy", () => home()], ["practicar", "🎯", "Practicar", () => practica()], ["aprender", "📖", "Aprender", () => aprender()], ["musica", "🎵", "Música", () => musica()], ["yo", "👤", "Yo", () => yo()]];
-function root(tab, ...n) {
-  show(...n);
-  const nav = $("#nav"); nav.hidden = false;
-  nav.replaceChildren(...TABS.map(([k, ic, lb, fn]) => h("button", { "aria-current": k === tab ? "page" : null, onclick: fn }, h("b", {}, ic), lb)));
-}
+const st = (n, l) => h("div", { class: "st" }, h("b", {}, String(n)), h("span", {}, l));
 
+/* ---------- Voz ---------- */
 const synth = window.speechSynthesis; let voices = [];
 if (synth) { voices = synth.getVoices(); synth.onvoiceschanged = () => voices = synth.getVoices(); }
 function say(t, rate = 1) {
@@ -130,16 +127,27 @@ function say(t, rate = 1) {
   });
 }
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-const speakBtn = t => [h("button", { class: "btn", "aria-label": "Escuchar", onclick: () => say(t) }, "🔊 Escuchar"),
-  h("button", { class: "btn", "aria-label": "Escuchar despacio", onclick: () => say(t, 0.7) }, "🐢 Despacio")];
+const speakBtn = t => [h("button", { class: "btn", onclick: () => say(t) }, "🔊 Escuchar"), h("button", { class: "btn", onclick: () => say(t, 0.7) }, "🐢 Despacio")];
 
+/* ---------- Navegación ---------- */
+let VT = null, PL = null, VIEW = 0, LOCAL = null; const LASTT = {};
+const show = (...n) => {
+  synth && synth.cancel(); clearInterval(VT); VIEW++;
+  if (PL) { try { PL.destroy(); } catch (e) {} PL = null; }
+  $("#nav").hidden = true;
+  $("#app").replaceChildren(...n.flat().filter(x => x != null && x !== false));
+  window.scrollTo(0, 0);
+};
+const TABS = [["hoy", "🏠", "Hoy", () => home()], ["practicar", "🎯", "Practicar", () => practica()], ["aprender", "📖", "Aprender", () => aprender()], ["videos", "🎬", "Videos", () => videos()], ["yo", "👤", "Yo", () => yo()]];
+function root(tab, ...n) {
+  show(...n);
+  const nav = $("#nav"); nav.hidden = false;
+  nav.replaceChildren(...TABS.map(([k, ic, lb, fn]) => h("button", { "aria-current": k === tab ? "page" : null, onclick: fn }, h("b", {}, ic), lb)));
+}
 let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  if ($("#nav button[aria-current=page]")?.textContent.includes("Yo")) yo();
-});
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferredPrompt = e; });
 
+/* ---------- Repetición espaciada ---------- */
 function streak() {
   const t = day(), d = S.days.slice().sort((a, b) => b - a);
   if (!d.length || d[0] < t - 1) return 0;
@@ -148,105 +156,85 @@ function streak() {
   return n;
 }
 function grade(it, ok) {
-  const st = S.items[it.id] || { b: 0, m: 0 }, t = day();
-  if (ok) { st.b = Math.min(5, st.b + 1); st.due = t + INT[st.b]; }
-  else { st.b = Math.max(0, st.b - 1); st.due = t; st.m = (st.m || 0) + 1; }
-  S.items[it.id] = st; save();
+  const s = seenOf(it) || { b: 0, m: 0 }, t = day();
+  if (ok) { s.b = Math.min(5, s.b + 1); s.due = t + INT[s.b]; }
+  else { s.b = Math.max(0, s.b - 1); s.due = t; s.m = (s.m || 0) + 1; }
+  S.items[it.id] = s; save();
 }
-function build() {
-  const t = day();
-  const due = ITEMS.filter(i => S.items[i.id] && S.items[i.id].due <= t)
-    .sort((a, b) => (S.items[b.id].m || 0) - (S.items[a.id].m || 0)).slice(0, 6);
-  const fresh = []; let n = 0;
-  for (const i of ITEMS) {
-    if (S.items[i.id]) continue;
-    if (i.t === "g") { fresh.push(i); continue; }
-    if (n < 3) { fresh.push(i); n++; } else break;
-  }
-  return [...fresh.map(i => ({ i, learn: true })), ...shuffle(due).map(i => ({ i }))];
-}
+const dueList = () => ITEMS.filter(i => i.t !== "g" && seenOf(i) && seenOf(i).due <= day());
+const freshList = () => ITEMS.filter(i => i.t !== "g" && !seenOf(i));
+const ruleFor = it => { const p = PK.find(p => p.items.includes(it)); return p && p.items.find(x => x.t === "g" && !seenOf(x)); };
 
-function home() {
-  const t = day(), due = ITEMS.filter(i => S.items[i.id] && S.items[i.id].due <= t).length;
-  const fresh = Math.min(3, ITEMS.filter(i => !S.items[i.id] && i.t !== "g").length);
-  const nothing = !due && !fresh;
-  root("hoy",
-    h("h1", {}, "Hoy"),
-    h("p", { class: "sub" }, nothing ? "Todo al día. Vuelve mañana." : "Una sesión corta. Tú solo pulsas el botón."),
-    h("div", { class: "stats" }, st(due, "por repasar"), st(fresh, "nuevas"), st(streak(), "días seguidos")),
-    h("button", { class: "btn main big", disabled: nothing ? "" : null, onclick: start }, "Empezar"),
-    h("button", { class: "btn big", style: "margin-top:12px;font-size:20px;padding:16px", onclick: nothing ? practica : startQuick }, nothing ? "Practicar más" : "Modo rápido (2 min)"));
-}
-const st = (n, l) => h("div", { class: "st" }, h("b", {}, String(n)), h("span", {}, l));
-
+/* ---------- Sesiones ---------- */
 let Q = [], qi = 0, R = { ok: 0, bad: 0 }, FROM = home;
-function start() {
-  Q = build(); qi = 0; R = { ok: 0, bad: 0 }; FROM = home;
-  if (!Q.length) return home();
+function run(list, from) {
+  Q = list; qi = 0; R = { ok: 0, bad: 0 }; FROM = from;
+  if (!Q.length) return from();
   next();
 }
+const start = () => run([...shuffle(dueList().sort((a, b) => (seenOf(b).m || 0) - (seenOf(a).m || 0)).slice(0, 6)), ...freshList().slice(0, 3)].map(i => ({ i })), home);
 function startQuick() {
-  const t = day();
-  let src = ITEMS.filter(i => i.t !== "g" && S.items[i.id] && S.items[i.id].due <= t);
-  if (!src.length) src = ITEMS.filter(i => i.t !== "g" && S.items[i.id]);
-  Q = shuffle(src).slice(0, 4).map(i => ({ i })); qi = 0; R = { ok: 0, bad: 0 }; FROM = home;
-  if (!Q.length) return start();
-  next();
+  let src = dueList();
+  if (!src.length) src = ITEMS.filter(i => i.t !== "g" && seenOf(i));
+  if (!src.length) return start();
+  run(shuffle(src).slice(0, 4).map(i => ({ i })), home);
 }
+const startMode = k => run(shuffle(pool(SEL)).slice(0, 10).map(i => ({ i, mode: k })), practica);
 const hdr = () => h("div", {}, h("button", { class: "back", onclick: () => FROM() }, "← Salir"),
   h("div", { class: "bar" }, h("i", { style: `width:${Math.round(100 * qi / Q.length)}%` })));
-function next() { if (qi >= Q.length) return (Q[0] && Q[0].free) ? FROM() : finish(); const q = Q[qi]; q.learn ? learn(q) : ex(q); }
-
-function learn(q) {
-  const it = q.i;
-  if (it.t === "g") {
-    show(hdr(), h("h2", {}, "Regla rápida"),
-      h("div", { class: "card" }, h("div", { class: "en", style: "font-size:22px" }, it.title), h("p", {}, it.text)),
-      h("button", { class: "btn main big", onclick: () => { S.items[it.id] = { b: 5, m: 0, due: day() + 99999 }; save(); qi++; next(); } }, "Entendido"));
-    return;
-  }
-  const body = it.t === "p"
-    ? [h("div", { class: "en" }, it.en), h("div", { class: "es" }, it.es), h("div", { class: "row" }, speakBtn(it.en))]
-    : [h("div", { class: "es" }, "Error típico"), h("div", { class: "en", style: "color:var(--bad);text-decoration:line-through" }, it.wrong),
-       h("div", { class: "en", style: "color:var(--ok)" }, it.right), h("p", {}, it.why), h("div", { class: "row" }, speakBtn(it.right))];
-  show(hdr(), h("h2", {}, "Nuevo"), h("div", { class: "card" }, body),
-    h("button", { class: "btn main big", onclick: () => { q.learn = false; ex(q); } }, "Practicar"));
-  if (it.t === "p") say(it.en); else say(it.right);
-}
+function next() { if (qi >= Q.length) return Q[0] && Q[0].free ? FROM() : finish(); ex(Q[qi]); }
 function ex(q) {
-  const it = q.i, b = (S.items[it.id] || { b: 0 }).b;
+  const it = q.i, b = (seenOf(it) || { b: 0 }).b;
   if (q.mode) return ({ hablar: () => SR ? speak(q) : order(q), escuchar: listen, ordenar: order, rellenar: cloze, dictado: dictar }[q.mode] || order)(q);
   if (it.t === "f") return fix(q);
   if (b < 2) return listen(q);
+  if (b < 3) return cloze(q);
   if (b < 4 || !SR) return order(q);
   speak(q);
 }
 function done(q, ok, extra) {
   if (navigator.vibrate) navigator.vibrate(ok ? 40 : [50, 50, 50]);
-  if (!q.free) grade(q.i, ok); ok ? R.ok++ : R.bad++;
-  if (!ok && !q.retry && !q.free) Q.push({ i: q.i, retry: true, mode: q.mode });
-  const fb = h("div", { class: "fb " + (ok ? "ok" : "bad") }, h("b", {}, ok ? "¡Bien!" : "Casi."), " ", extra || "");
-  $("#app").append(fb, h("button", { class: "btn main big", onclick: () => { qi++; next(); } }, "Siguiente"));
-  fb.scrollIntoView({ block: "nearest" });
+  if (!q.free) { grade(q.i, ok); ok ? R.ok++ : R.bad++; if (!ok && !q.retry) Q.push({ i: q.i, retry: true, mode: q.mode }); }
+  const out = [h("div", { class: "fb " + (ok ? "ok" : "bad") }, h("b", {}, ok ? "¡Bien!" : "Casi."), " ", extra || "")];
+  const g = !q.free && !q.mode ? ruleFor(q.i) : null;
+  if (g) { S.items[g.id] = { b: 5, m: 0, due: day() + 99999 }; save(); out.push(h("div", { class: "card" }, h("b", {}, "💡 " + g.title), h("p", {}, g.text))); }
+  out.push(h("button", { class: "btn main big", onclick: () => { qi++; next(); } }, "Siguiente"));
+  $("#app").append(...out); out[0].scrollIntoView({ block: "nearest" });
 }
-
-function listen(q) {
-  const it = q.i, pool = ITEMS.filter(x => x.t === "p" && x.id !== it.id);
-  const opts = shuffle([it, ...shuffle(pool).slice(0, 2)]);
+/* Pregunta de opción múltiple (sirve para escuchar, rellenar y corregir) */
+function choose(q, title, head, opts, extra, sayText) {
   const box = h("div", {});
   opts.forEach(o => box.append(h("button", { class: "btn opt", onclick: e => {
     box.querySelectorAll("button").forEach(b => b.disabled = true);
-    const ok = o.id === it.id;
-    e.target.classList.add(ok ? "ok" : "bad");
-    if (!ok) [...box.children][opts.indexOf(it)].classList.add("ok");
-    done(q, ok, it.en);
-  } }, o.es)));
-  show(hdr(), h("h2", {}, "¿Qué significa?"), h("div", { class: "row" }, speakBtn(it.en)), box);
+    e.target.classList.add(o.ok ? "ok" : "bad");
+    if (!o.ok) [...box.children][opts.findIndex(x => x.ok)].classList.add("ok");
+    if (sayText) say(sayText);
+    done(q, o.ok, extra);
+  } }, o.t)));
+  show(hdr(), h("h2", {}, title), head, box);
+}
+function listen(q) {
+  const it = q.i, others = shuffle(ITEMS.filter(x => x.t === "p" && x.id !== it.id)).slice(0, 2);
+  choose(q, "¿Qué significa?", h("div", { class: "row" }, speakBtn(it.en)),
+    shuffle([{ t: it.es, ok: true }, ...others.map(x => ({ t: x.es }))]), it.en);
   say(it.en);
 }
-
+function cloze(q) {
+  const it = q.i, toks = it.en.split(" ");
+  const cand = toks.map((w, i) => i).filter(i => (words(toks[i])[0] || "").length >= 3);
+  const idx = cand.length ? cand[Math.random() * cand.length | 0] : 0;
+  const right = words(toks[idx])[0] || toks[idx].toLowerCase();
+  const others = [...new Set(ITEMS.filter(x => x.t === "p" && x.id !== it.id).flatMap(x => words(x.en)).filter(w => w.length >= 3 && w !== right))];
+  const shown = toks.map((w, i) => i === idx ? w.replace(/[A-Za-z’']+/, "_____") : w).join(" ");
+  choose(q, "Completa la frase", h("div", { class: "card" }, h("div", { class: "en" }, shown), h("div", { class: "es" }, it.es)),
+    shuffle([{ t: right, ok: true }, ...shuffle(others).slice(0, 2).map(w => ({ t: w }))]), it.en, it.en);
+}
+function fix(q) {
+  const it = q.i;
+  choose(q, "¿Cuál es correcta?", null, shuffle([{ t: it.right, ok: true }, { t: it.wrong }]), it.why, it.right);
+}
 function order(q) {
-  const it = q.i, target = it.en.split(" "), bank = shuffle(target.map((w, i) => ({ w, i })));
+  const it = q.i, bank = shuffle(it.en.split(" ").map((w, i) => ({ w, i })));
   let pick = [];
   const ans = h("div", { class: "ans" }), pool = h("div", { class: "row" }), chk = h("button", { class: "btn main big", disabled: "" }, "Comprobar");
   const draw = () => {
@@ -256,59 +244,11 @@ function order(q) {
   };
   chk.onclick = () => {
     chk.remove(); pool.remove();
-    const ok = norm(pick.map(p => p.w).join(" ")) === norm(it.en);
     ans.querySelectorAll("button").forEach(b => b.disabled = true);
-    say(it.en); done(q, ok, it.en);
+    say(it.en); done(q, norm(pick.map(p => p.w).join(" ")) === norm(it.en), it.en);
   };
   show(hdr(), h("h2", {}, "Dilo en inglés"), h("div", { class: "card" }, h("div", { class: "es", style: "font-size:22px;color:var(--ink)" }, it.es)), ans, pool, chk);
   draw();
-}
-
-function speak(q) {
-  const it = q.i, tw = words(it.en), ok = tw.map(() => false);
-  let rec = null, stopping = false, base = "", last = "", fatal = false;
-  const line = h("div", { class: "en" }), btn = h("button", { class: "btn main big" }, "Hablar");
-  const spans = it.en.split(" ").map((w, i) => h("span", { class: "sw" }, w + " "));
-  line.append(...spans);
-  const paint = () => { const n = ok.indexOf(false); spans.forEach((s, i) => { s.className = "sw" + (ok[i] ? " g" : i === n && rec ? " n" : ""); }); };
-  const track = txt => {
-    let p = 0;
-    for (const w of words(txt)) { for (let j = p; j < Math.min(p + 3, tw.length); j++) if (w === tw[j]) { ok[j] = true; p = j + 1; break; } if (p >= tw.length) break; }
-    paint(); if (p >= tw.length && rec) { stopping = true; rec.stop(); }
-  };
-  const finishIt = () => { rec = null; btn.remove(); skip.remove(); const n = ok.filter(Boolean).length; done(q, n >= Math.ceil(tw.length * .8), it.en); };
-  const skip = h("button", { class: "btn", style: "margin-top:10px", onclick: () => { if (rec) { stopping = true; rec.abort(); } q.i = it; order(q); } }, "No puedo hablar ahora");
-  btn.onclick = () => {
-    if (rec) { stopping = true; rec.stop(); return; }
-    { const m = $("#micmsg"); if (m) m.remove(); } fatal = false; stopping = false; base = ""; last = ""; ok.fill(false); rec = new SR(); rec.lang = S.accent; rec.continuous = true; rec.interimResults = true;
-    rec.onresult = e => { last = (base + " " + Array.from(e.results).map(r => r[0].transcript).join(" ")).trim(); track(last); };
-    rec.onend = () => { if (fatal) { rec = null; btn.textContent = "Hablar"; paint(); return; } if (!stopping) { base = last; try { rec.start(); return; } catch (e) {} } finishIt(); };
-    rec.onerror = e => {
-    const msg = { "not-allowed": "Permite el micrófono en el navegador para hablar.", "service-not-allowed": "Permite el micrófono en el navegador para hablar.", "network": "El reconocimiento de voz necesita internet.", "audio-capture": "No encuentro un micrófono." }[e.error];
-    if (msg) { fatal = true; stopping = true; if (!$("#micmsg")) $("#app").append(h("p", { id: "micmsg", class: "fb bad" }, msg)); }
-  };
-    btn.textContent = "Terminar"; paint(); rec.start();
-  };
-  show(hdr(), h("h2", {}, "Dilo en voz alta"), h("div", { class: "card" }, h("div", { class: "es", style: "font-size:22px;color:var(--ink);margin-bottom:10px" }, it.es), line), btn, skip);
-}
-
-function cloze(q) {
-  const it = q.i, toks = it.en.split(" ");
-  const cand = toks.map((w, i) => i).filter(i => words(toks[i]).length && words(toks[i])[0].length >= 3);
-  const idx = cand.length ? cand[Math.random() * cand.length | 0] : 0;
-  const right = words(toks[idx])[0] || toks[idx].toLowerCase();
-  const others = [...new Set(ITEMS.filter(x => x.t === "p" && x.id !== it.id).flatMap(x => words(x.en)).filter(w => w.length >= 3 && w !== right))];
-  const opts = shuffle([right, ...shuffle(others).slice(0, 2)]);
-  const shown = toks.map((w, i) => i === idx ? w.replace(/[A-Za-z’']+/, "_____") : w).join(" ");
-  const box = h("div", {});
-  opts.forEach(o => box.append(h("button", { class: "btn opt", onclick: e => {
-    box.querySelectorAll("button").forEach(b => b.disabled = true);
-    const ok = o === right;
-    e.target.classList.add(ok ? "ok" : "bad");
-    if (!ok) [...box.children][opts.indexOf(right)].classList.add("ok");
-    say(it.en); done(q, ok, it.en);
-  } }, o)));
-  show(hdr(), h("h2", {}, "Completa la frase"), h("div", { class: "card" }, h("div", { class: "en" }, shown), h("div", { class: "es" }, it.es)), box);
 }
 function dictar(q) {
   const it = q.i, inp = h("input", { type: "text", class: "search", placeholder: "Escribe lo que oyes…", autocomplete: "off", autocapitalize: "none", spellcheck: "false" });
@@ -316,26 +256,54 @@ function dictar(q) {
   show(hdr(), h("h2", {}, "Dictado"), h("p", { class: "sub" }, "Escucha y escribe la frase en inglés."), h("div", { class: "row" }, speakBtn(it.en)), inp, chk);
   say(it.en);
 }
-function fix(q) {
-  const it = q.i, opts = shuffle([it.wrong, it.right]), box = h("div", {});
-  opts.forEach(o => box.append(h("button", { class: "btn opt", onclick: e => {
-    box.querySelectorAll("button").forEach(b => b.disabled = true);
-    const ok = o === it.right;
-    e.target.classList.add(ok ? "ok" : "bad");
-    if (!ok) [...box.children][opts.indexOf(it.right)].classList.add("ok");
-    say(it.right); done(q, ok, it.why);
-  } }, o)));
-  show(hdr(), h("h2", {}, "¿Cuál es correcta?"), box);
+function speak(q) {
+  const it = q.i, tw = words(it.en), ok = tw.map(() => false);
+  let rec = null, stopping = false, base = "", last = "", fatal = false;
+  const spans = it.en.split(" ").map(w => h("span", { class: "sw" }, w + " "));
+  const btn = h("button", { class: "btn main big" }, "Hablar");
+  const paint = () => { const n = ok.indexOf(false); spans.forEach((s, i) => { s.className = "sw" + (ok[i] ? " g" : i === n && rec ? " n" : ""); }); };
+  const track = txt => {
+    let p = 0;
+    for (const w of words(txt)) { for (let j = p; j < Math.min(p + 3, tw.length); j++) if (w === tw[j]) { ok[j] = true; p = j + 1; break; } if (p >= tw.length) break; }
+    paint(); if (p >= tw.length && rec) { stopping = true; rec.stop(); }
+  };
+  const skip = h("button", { class: "btn", style: "margin-top:10px", onclick: () => { if (rec) { stopping = true; rec.abort(); } order(q); } }, "No puedo hablar ahora");
+  btn.onclick = () => {
+    if (rec) { stopping = true; rec.stop(); return; }
+    const m = $("#micmsg"); if (m) m.remove();
+    fatal = false; stopping = false; base = ""; last = ""; ok.fill(false);
+    rec = new SR(); rec.lang = S.accent; rec.continuous = true; rec.interimResults = true;
+    rec.onresult = e => { last = (base + " " + Array.from(e.results).map(r => r[0].transcript).join(" ")).trim(); track(last); };
+    rec.onerror = e => {
+      const msg = { "not-allowed": "Permite el micrófono en el navegador para hablar.", "service-not-allowed": "Permite el micrófono en el navegador para hablar.", "network": "El reconocimiento de voz necesita internet.", "audio-capture": "No encuentro un micrófono." }[e.error];
+      if (msg) { fatal = true; stopping = true; if (!$("#micmsg")) $("#app").append(h("p", { id: "micmsg", class: "fb bad" }, msg)); }
+    };
+    rec.onend = () => {
+      if (fatal) { rec = null; btn.textContent = "Hablar"; paint(); return; }
+      if (!stopping) { base = last; try { rec.start(); return; } catch (e) {} }
+      rec = null; btn.remove(); skip.remove();
+      done(q, ok.filter(Boolean).length >= Math.ceil(tw.length * .8), it.en);
+    };
+    btn.textContent = "Terminar"; paint(); rec.start();
+  };
+  show(hdr(), h("h2", {}, "Dilo en voz alta"), h("div", { class: "card" }, it.es ? h("div", { class: "es", style: "font-size:22px;color:var(--ink);margin-bottom:10px" }, it.es) : null, h("div", { class: "en" }, spans)), btn, skip);
 }
-
 function finish() {
   const t = day(); if (!S.days.includes(t)) S.days.push(t); save();
-  const tot = R.ok + R.bad;
-  show(h("h1", {}, "Listo"), h("p", { class: "sub" }, `${R.ok} de ${tot} bien. ${streak()} días seguidos.`),
-    R.bad ? h("p", {}, "Lo que fallaste volverá a aparecer pronto.") : h("p", {}, "Sin errores hoy."),
+  show(h("h1", {}, "Listo"), h("p", { class: "sub" }, `${R.ok} de ${R.ok + R.bad} bien. ${streak()} días seguidos.`),
+    h("p", {}, R.bad ? "Lo que fallaste volverá a aparecer pronto." : "Sin errores hoy."),
     h("button", { class: "btn main big", onclick: () => FROM() }, "Terminar"));
 }
 
+/* ---------- Pestañas: Hoy, Practicar, Aprender, Yo ---------- */
+function home() {
+  const due = dueList().length, fresh = Math.min(3, freshList().length), nothing = !due && !fresh;
+  root("hoy", h("h1", {}, "Hoy"),
+    h("p", { class: "sub" }, nothing ? "Todo al día. Vuelve mañana." : "Pulsa y empiezas a practicar al instante."),
+    h("div", { class: "stats" }, st(due, "por repasar"), st(fresh, "nuevas"), st(streak(), "días seguidos")),
+    h("button", { class: "btn main big", disabled: nothing ? "" : null, onclick: start }, "Empezar"),
+    h("button", { class: "btn big", style: "margin-top:12px;font-size:20px;padding:16px", onclick: nothing ? practica : startQuick }, nothing ? "Practicar más" : "Modo rápido (2 min)"));
+}
 let SEL = "todos";
 const pool = sel => ITEMS.filter(i => i.t === "p" && (sel === "todos" || (PK.find(p => p.id === sel) || { items: [] }).items.includes(i)));
 function practica() {
@@ -347,114 +315,173 @@ function practica() {
     modes.map(([k, ic, t, d]) => h("button", { class: "btn mode", disabled: (n < 3 || (k === "hablar" && !SR)) ? "" : null, onclick: () => startMode(k) },
       h("b", {}, ic + " " + t), h("span", {}, k === "hablar" && !SR ? "Tu navegador no admite voz. Usa Chrome o Edge." : d))));
 }
-function startMode(k) {
-  Q = shuffle(pool(SEL)).slice(0, 10).map(i => ({ i, mode: k })); qi = 0; R = { ok: 0, bad: 0 }; FROM = practica;
-  if (!Q.length) return practica();
-  next();
-}
-
+const row = i => i.t === "g" ? h("div", { class: "card" }, h("b", {}, "Regla: " + i.title), h("p", {}, i.text))
+  : i.t === "f" ? h("div", { class: "li" }, h("div", { class: "tiny", style: "text-decoration:line-through" }, i.wrong), h("div", { class: "en", style: "font-size:20px" }, i.right), h("div", { class: "tiny" }, i.why))
+  : h("div", { class: "li", style: "cursor:pointer", onclick: () => say(i.en) }, h("div", { class: "en", style: "font-size:20px" }, "🔊 " + i.en), h("div", { class: "tiny" }, i.es));
 function aprender() {
-  const searchWrap = h("input", { type: "search", class: "search", placeholder: "🔍 Buscar frase, palabra o regla...", oninput: (e) => filterLearn(e.target.value) });
-  const listWrap = h("div", { id: "learn-list" });
-  root("aprender", h("h1", { style: "font-size:40px" }, "Aprender"), h("p", { class: "sub" }, "Repasa reglas y frases por tema, sin examen."), searchWrap, listWrap);
+  const list = h("div", { id: "learn-list" });
+  root("aprender", h("h1", { style: "font-size:40px" }, "Aprender"), h("p", { class: "sub" }, "Repasa reglas y frases por tema, sin examen."),
+    h("input", { type: "search", class: "search", placeholder: "🔍 Buscar frase, palabra o regla...", oninput: e => filterLearn(e.target.value) }), list);
   filterLearn("");
 }
 function filterLearn(q) {
-  const list = $("#learn-list");
-  if (!list) return;
+  const list = $("#learn-list"); if (!list) return;
   q = q.toLowerCase().trim();
-  if (!q) {
-    list.replaceChildren(...PK.map(p => h("button", { class: "btn mode", onclick: () => packView(p) }, h("b", {}, p.title), h("span", {}, `${p.items.filter(i => i.t === "p").length} frases y ${p.items.filter(i => i.t === "f").length} errores típicos`))));
-    return;
-  }
-  const results = ITEMS.filter(i => {
-    const text = (i.t === "p" ? i.en + " " + i.es : i.t === "f" ? i.wrong + " " + i.right + " " + i.why : i.title + " " + i.text).toLowerCase();
-    return text.includes(q);
-  });
-  if (!results.length) return list.replaceChildren(h("p", { class: "sub" }, "No se encontraron resultados."));
-  list.replaceChildren(...results.slice(0, 50).map(i => 
-    i.t === "g" ? h("div", { class: "card" }, h("b", {}, "Regla: " + i.title), h("p", {}, i.text))
-    : i.t === "f" ? h("div", { class: "li" }, h("div", { class: "tiny", style: "text-decoration:line-through" }, i.wrong), h("div", { class: "en", style: "font-size:20px" }, i.right), h("div", { class: "tiny" }, i.why))
-    : h("div", { class: "li", style: "cursor:pointer", onclick: () => say(i.en) }, h("div", { class: "en", style: "font-size:20px" }, "🔊 " + i.en), h("div", { class: "tiny" }, i.es))
-  ));
+  if (!q) return list.replaceChildren(...PK.map(p => h("button", { class: "btn mode", onclick: () => packView(p) }, h("b", {}, p.title),
+    h("span", {}, `${p.items.filter(i => i.t === "p").length} frases y ${p.items.filter(i => i.t === "f").length} errores típicos`))));
+  const res = ITEMS.filter(i => (i.t === "p" ? i.en + " " + i.es : i.t === "f" ? i.wrong + " " + i.right + " " + i.why : i.title + " " + i.text).toLowerCase().includes(q));
+  list.replaceChildren(...(res.length ? res.slice(0, 50).map(row) : [h("p", { class: "sub" }, "No se encontraron resultados.")]));
 }
-function packView(p) {
-  root("aprender", h("button", { class: "back", onclick: aprender }, "← Temas"), h("h2", {}, p.title),
-    p.items.map(i => i.t === "g" ? h("div", { class: "card" }, h("b", {}, "Regla: " + i.title), h("p", {}, i.text))
-      : i.t === "f" ? h("div", { class: "li" }, h("div", { class: "tiny", style: "text-decoration:line-through" }, i.wrong), h("div", { class: "en", style: "font-size:20px" }, i.right), h("div", { class: "tiny" }, i.why))
-      : h("div", { class: "li", style: "cursor:pointer", onclick: () => say(i.en) }, h("div", { class: "en", style: "font-size:20px" }, "🔊 " + i.en), h("div", { class: "tiny" }, i.es))));
-}
+const packView = p => root("aprender", h("button", { class: "back", onclick: aprender }, "← Temas"), h("h2", {}, p.title), p.items.map(row));
 
-const ytId = u => { const m = String(u).match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/); return m ? m[1] : /^[\w-]{11}$/.test(String(u).trim()) ? String(u).trim() : null; };
-function musica() {
-  const SG = [...(window.SONGS || []), ...(S.mySongs || [])];
-  root("musica", h("h1", { style: "font-size:40px" }, "Música"),
-    h("p", { class: "sub" }, "Aprende con canciones y videos. Toca una línea para oírla o practicarla."),
-    SG.map(s => h("button", { class: "btn mode", onclick: () => songView(s) }, h("b", {}, "🎵 " + s.title), h("span", {}, s.artist || "Mi video"))),
-    h("button", { class: "btn main", style: "width:100%", onclick: addSong }, "＋ Agregar canción o video"));
-}
-function addSong() {
-  const t = h("input", { class: "search", placeholder: "Título" }), u = h("input", { class: "search", placeholder: "Enlace de YouTube" }),
-    l = h("textarea", { class: "search", rows: "6", placeholder: "Letra o transcripción en inglés, una línea por renglón (opcional). Se guarda solo en tu dispositivo." }), msg = h("p", { class: "tiny" });
-  root("musica", h("button", { class: "back", onclick: musica }, "← Canciones"), h("h2", {}, "Agregar"), t, u, l, msg,
-    h("button", { class: "btn main big", onclick: () => {
-      const id = ytId(u.value);
-      if (!t.value.trim() || !id) { msg.textContent = "Escribe un título y un enlace de YouTube válido."; return; }
-      (S.mySongs = S.mySongs || []).push({ id: "m" + Date.now(), title: t.value.trim(), yt: id, mine: true, lines: l.value.split("\n").map(x => x.trim()).filter(Boolean) });
-      save(); musica();
-    } }, "Guardar"));
-}
-function songView(s) {
-  const url = `https://www.youtube.com/watch?v=${s.yt}`;
-  const player = location.protocol === "file:"
-    ? h("div", { class: "card" }, h("p", {}, "YouTube no reproduce videos dentro de un archivo abierto desde tu disco (error 153). Publica la app en https o ábrela desde localhost. Mientras tanto, ábrelo en YouTube."))
-    : h("div", { class: "video-container" }, h("iframe", { src: `https://www.youtube-nocookie.com/embed/${s.yt}?rel=0&playsinline=1`, title: s.title, loading: "lazy",
-        allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture", referrerpolicy: "strict-origin-when-cross-origin", allowfullscreen: "" }));
-  const lines = s.lyrics || (s.lines || []).map(en => ({ en }));
-  const practice = en => { Q = [{ i: { id: "~l", t: "p", en, es: "" }, mode: "hablar", free: true }]; qi = 0; R = { ok: 0, bad: 0 }; FROM = () => songView(s); next(); };
-  const rows = lines.map(l => h("div", { class: "li" },
-    h("div", { style: "cursor:pointer", onclick: () => say(l.en) }, h("div", { class: "en", style: "font-size:20px;color:var(--brand)" }, "🔊 " + l.en), l.es ? h("div", { class: "tiny" }, l.es) : null),
-    SR ? h("button", { class: "chip", style: "margin-top:6px", onclick: () => practice(l.en) }, "🎤 Repetir") : null));
-  root("musica", h("button", { class: "back", onclick: musica }, "← Canciones"), h("h2", {}, s.title), h("p", { class: "sub" }, s.artist || ""), player,
-    h("p", {}, h("a", { href: url, target: "_blank", rel: "noopener", style: "color:var(--brand)" }, "Abrir en YouTube")),
-    rows.length ? h("div", {}, rows) : h("p", { class: "tiny" }, "Sin letra todavía."),
-    s.mine ? h("button", { class: "btn", style: "margin-top:14px", onclick: () => { if (confirm("¿Quitar este video?")) { S.mySongs = S.mySongs.filter(x => x.id !== s.id); save(); musica(); } } }, "Quitar") : null);
-}
-
-function renderHeatmap() {
-  const t = day(); const days = [];
-  for (let i = 29; i >= 0; i--) days.push(t - i);
-  return h("div", { class: "heatmap" }, days.map(d => {
-    const done = S.days.includes(d);
-    const str = new Date(d * 864e5).toLocaleDateString('es-ES', { month: 'short', day: 'numeric', timeZone: 'UTC' });
-    return h("div", { class: "hm-cell" + (done ? " done" : ""), title: str + (done ? " (completado)" : "") });
-  }));
-}
 function yo() {
-  const seen = Object.keys(S.items).length, errs = Object.values(S.items).filter(x => x.m).length;
-  const installBtn = deferredPrompt ? h("button", { class: "btn main", style: "width:100%; margin-bottom:20px; padding:16px;", onclick: async () => {
-      deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') deferredPrompt = null; yo();
-    } }, "📲 Instalar App en mi móvil") : null;
-  root("yo", h("h1", { style: "font-size:40px" }, "Yo"), installBtn, h("div", { class: "stats" }, st(streak(), "días seguidos"), st(seen, "vistas"), st(errs, "con errores")),
-    h("h2", { style: "font-size:20px; margin-top:10px;" }, "Últimos 30 días"), renderHeatmap(), h("p", { class: "tiny" }, "Acento"),
+  const seen = ITEMS.filter(i => i.t !== "g" && seenOf(i)).length, errs = ITEMS.filter(i => (seenOf(i) || {}).m).length;
+  const install = deferredPrompt ? h("button", { class: "btn main", style: "width:100%;margin-bottom:20px;padding:16px", onclick: async () => {
+    deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if (outcome === "accepted") deferredPrompt = null; yo();
+  } }, "📲 Instalar App en mi móvil") : null;
+  root("yo", h("h1", { style: "font-size:40px" }, "Yo"), install,
+    h("div", { class: "stats" }, st(streak(), "días seguidos"), st(seen, "vistas"), st(errs, "con errores")),
+    h("h2", { style: "font-size:20px;margin-top:10px" }, "Últimos 30 días"), heatmap(),
+    h("p", { class: "tiny" }, "Acento"),
     h("div", { class: "row" }, Object.entries(ACC).map(([k, v]) => h("button", { class: "chip", "aria-pressed": String(S.accent === k), onclick: () => { S.accent = k; save(); yo(); } }, v))),
     h("div", { class: "row" }, h("button", { class: "btn", onclick: errors }, "Mis errores"), h("button", { class: "btn", onclick: backup }, "Respaldo")));
 }
+function heatmap() {
+  const t = day();
+  return h("div", { class: "heatmap" }, Array.from({ length: 30 }, (_, i) => t - 29 + i).map(d => {
+    const on = S.days.includes(d), s = new Date(d * 864e5).toLocaleDateString("es-ES", { month: "short", day: "numeric", timeZone: "UTC" });
+    return h("div", { class: "hm-cell" + (on ? " done" : ""), title: s + (on ? " (completado)" : "") });
+  }));
+}
 function errors() {
-  const list = ITEMS.filter(i => (S.items[i.id] || {}).m).sort((a, b) => S.items[b.id].m - S.items[a.id].m);
+  const list = ITEMS.filter(i => (seenOf(i) || {}).m).sort((a, b) => S.items[b.id].m - S.items[a.id].m);
   root("yo", h("button", { class: "back", onclick: yo }, "← Volver"), h("h2", {}, "Mis errores"),
-    list.length ? list.map(i => h("div", { class: "li" }, h("div", { class: "en", style: "font-size:20px" }, i.t === "p" ? i.en : i.right), h("div", { class: "tiny" }, `${i.t === "p" ? i.es : i.why} (fallos: ${S.items[i.id].m})`))) : h("p", { class: "sub" }, "Aún no hay errores."));
+    list.length ? list.map(i => h("div", { class: "li" }, h("div", { class: "en", style: "font-size:20px" }, i.t === "p" ? i.en : i.right),
+      h("div", { class: "tiny" }, `${i.t === "p" ? i.es : i.why} (fallos: ${S.items[i.id].m})`))) : h("p", { class: "sub" }, "Aún no hay errores. Aquí aparecerá lo que más te cuesta."));
 }
 function backup() {
   const inp = h("input", { type: "file", accept: "application/json", style: "display:none", onchange: e => {
     const f = e.target.files[0]; if (!f) return;
     f.text().then(t => { try { S = Object.assign({ items: {}, days: [], accent: "en-US" }, JSON.parse(t)); save(); yo(); } catch (x) { alert("Archivo no válido."); } });
   } });
-  root("yo", h("button", { class: "back", onclick: yo }, "← Volver"), h("h2", {}, "Respaldo"), h("p", {}, "Guarda o carga tu progreso."),
+  root("yo", h("button", { class: "back", onclick: yo }, "← Volver"), h("h2", {}, "Respaldo"), h("p", {}, "Guarda o carga tu progreso, tus videos y sus transcripciones."),
     h("div", { class: "row" }, h("button", { class: "btn main", onclick: () => {
-        const a = h("a", { href: URL.createObjectURL(new Blob([JSON.stringify(S)], { type: "application/json" })), download: "progreso-ingles.json" }); a.click();
-      } }, "Guardar progreso"), h("button", { class: "btn", onclick: () => inp.click() }, "Cargar progreso"), inp));
+      h("a", { href: URL.createObjectURL(new Blob([JSON.stringify(S)], { type: "application/json" })), download: "progreso-ingles.json" }).click();
+    } }, "Guardar progreso"), h("button", { class: "btn", onclick: () => inp.click() }, "Cargar progreso"), inp));
+}
+
+/* ---------- Videos con transcripción sincronizada ---------- */
+const ytId = u => { u = String(u).trim(); const m = u.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/); return m ? m[1] : /^[\w-]{11}$/.test(u) ? u : null; };
+const cuesOf = v => v.cues || (v.lyrics ? v.lyrics.map(l => ({ t: null, text: l.en, es: l.es })) : (v.lines || []).map(x => ({ t: null, text: x })));
+const fmt = t => Math.floor(t / 60) + ":" + String(Math.floor(t % 60)).padStart(2, "0");
+/* Acepta la transcripción copiada de YouTube ("0:12 texto" o la hora en una línea y el texto abajo) y formato LRC "[00:12.30]texto" */
+function parseCues(txt) {
+  const re = /^\s*\[?(?:(\d+):)?(\d{1,2}):(\d{2})(?:[.,](\d{1,3}))?\]?\s*(.*)$/, out = []; let cur = null;
+  for (const raw of txt.split(/\r?\n/)) {
+    const line = raw.trim(); if (!line) continue;
+    const m = line.match(re);
+    if (m) out.push(cur = { t: (+m[1] || 0) * 3600 + +m[2] * 60 + +m[3] + (m[4] ? +("0." + m[4]) : 0), text: m[5] });
+    else if (cur && cur.t != null) cur.text += (cur.text ? " " : "") + line;
+    else out.push(cur = { t: null, text: line });
+  }
+  const timed = out.filter(c => c.t != null && c.text);
+  return (timed.length ? timed.sort((a, b) => a.t - b.t) : out.filter(c => c.text)).map(c => ({ t: c.t, text: c.text.replace(/\s+/g, " ").trim() }));
+}
+let ytLoad = null;
+const loadYT = () => ytLoad || (ytLoad = new Promise(res => {
+  if (window.YT && YT.Player) return res();
+  window.onYouTubeIframeAPIReady = res;
+  const s = document.createElement("script"); s.src = "https://www.youtube.com/iframe_api"; document.head.append(s);
+}));
+const adaptYT = p => ({ play: () => p.playVideo(), pause: () => p.pauseVideo(), seek: t => p.seekTo(t, true), time: () => p.getCurrentTime() || 0, rate: r => p.setPlaybackRate(r) });
+const adaptEl = m => ({ play: () => m.play(), pause: () => m.pause(), seek: t => { m.currentTime = t; }, time: () => m.currentTime, rate: r => { m.playbackRate = r; } });
+const YE = { 2: "El enlace del video no es válido.", 5: "El reproductor falló. Prueba otra vez.", 100: "El video no existe o es privado.",
+  101: "El dueño no permite reproducirlo fuera de YouTube.", 150: "El dueño no permite reproducirlo fuera de YouTube (suele pasar con música protegida).",
+  153: "YouTube no recibió el origen de la página. Abre la app desde https o localhost." };
+
+function videos() {
+  const L = [...(window.SONGS || []), ...(S.mySongs || [])];
+  root("videos", h("h1", { style: "font-size:40px" }, "Videos"), h("p", { class: "sub" }, "Mira y escucha mientras la transcripción te sigue."),
+    L.map(v => h("button", { class: "btn mode", onclick: () => videoView(v) }, h("b", {}, "🎬 " + v.title),
+      h("span", {}, v.artist || (cuesOf(v)[0] && cuesOf(v)[0].t != null ? "Transcripción sincronizada" : "Sin sincronizar")))),
+    h("button", { class: "btn main", style: "width:100%", onclick: () => addVideo() }, "＋ Agregar video"),
+    h("div", { class: "card", style: "margin-top:16px" }, h("b", {}, "Cómo agregar uno"),
+      h("p", { class: "tiny" }, "1. Abre el video en YouTube. 2. Pulsa ⋯ y luego Mostrar transcripción. 3. Copia todo el texto y pégalo aquí. Se guarda en tu dispositivo y no gasta nada más.")),
+    h("p", { class: "tiny" }, "Las canciones suelen estar bloqueadas por derechos de autor. Rinden más las charlas, las noticias lentas y los canales para aprender inglés."));
+}
+function addVideo(v) {
+  const t = h("input", { class: "search", placeholder: "Título", value: v ? v.title : "" }), u = h("input", { class: "search", placeholder: "Enlace de YouTube (opcional si usarás tu propio audio)", value: v && v.yt ? "https://youtu.be/" + v.yt : "" }),
+    l = h("textarea", { class: "search", rows: "9", placeholder: "Transcripción: pégala tal como la copiaste de YouTube, o en formato LRC. Una línea por renglón si no tiene tiempos." }), msg = h("p", { class: "tiny" });
+  if (v && v.raw) l.value = v.raw;
+  root("videos", h("button", { class: "back", onclick: () => v ? videoView(v) : videos() }, "← Volver"), h("h2", {}, v ? "Editar" : "Agregar"), t, u, l, msg,
+    h("button", { class: "btn main big", onclick: () => {
+      const yt = u.value.trim() ? ytId(u.value) : null;
+      if (!t.value.trim()) { msg.textContent = "Escribe un título."; return; }
+      if (u.value.trim() && !yt) { msg.textContent = "Ese enlace de YouTube no es válido."; return; }
+      const rec = { id: v ? v.id : "m" + Date.now(), title: t.value.trim(), yt, mine: true, raw: l.value, cues: parseCues(l.value) };
+      const L = S.mySongs = S.mySongs || [], k = L.findIndex(x => x.id === rec.id);
+      k >= 0 ? L[k] = rec : L.push(rec); save(); videoView(rec);
+    } }, "Guardar"));
+}
+function videoView(v) {
+  const cues = cuesOf(v), timed = cues.length > 0 && cues[0].t != null;
+  cues.forEach((c, i) => { c.end = cues[i + 1] && cues[i + 1].t != null ? cues[i + 1].t : (c.t || 0) + 4; });
+  let ad = null, loopIdx = -1, hide = true, cur = -1, rate = 1;
+  const resume = LASTT[v.id] || 0;
+  const holder = h("div", {}), wrap = h("div", { class: "video-container" }, holder);
+  const media = h("video", { controls: "", playsinline: "", style: "width:100%;display:none;border-radius:14px;max-height:40vh" });
+  const note = h("p", { class: "tiny" });
+  const fail = msg => wrap.replaceChildren(h("div", { class: "card", style: "margin:0;border-radius:14px" }, h("p", {}, msg), h("p", { class: "tiny" }, "Prueba con otro video, ábrelo en YouTube o usa tu propio audio.")));
+  const useLocal = url => {
+    wrap.style.display = "none"; media.style.display = "block"; media.src = url;
+    media.onloadedmetadata = () => { if (resume) media.currentTime = resume; };
+    ad = adaptEl(media); ad.rate(rate);
+  };
+  const lineShadow = text => { LASTT[v.id] = ad ? ad.time() : 0; if (ad) ad.pause(); run([{ i: { id: "~l", t: "p", en: text, es: "" }, mode: "hablar", free: true }], () => videoView(v)); };
+  const els = cues.map(c => h("div", { class: "cue", onclick: () => { if (timed && ad) { ad.seek(c.t); ad.play(); } else say(c.text); } },
+    timed ? h("div", { class: "tm" }, fmt(c.t)) : null, h("div", { class: "tx" }, c.text), c.es ? h("div", { class: "tiny" }, c.es) : null,
+    SR ? h("button", { class: "chip", style: "margin-top:6px", onclick: e => { e.stopPropagation(); lineShadow(c.text); } }, "🎤 Repetir") : null));
+  const paint = () => els.forEach((e, i) => { e.className = "cue" + (!timed ? "" : i === cur ? " cur" : i < cur ? " past" : " fut" + (hide ? " hide" : "")); });
+  const chip = (l, fn, on) => h("button", { class: "chip", "aria-pressed": on == null ? null : String(on), onclick: fn }, l);
+  const speeds = [0.5, 0.75, 1].map(r => [r, chip(r + "×", () => { rate = r; ad && ad.rate(r); speeds.forEach(([x, b]) => b.setAttribute("aria-pressed", String(x === r))); }, r === 1)]);
+  const hideB = chip("Ocultar lo que falta", () => { hide = !hide; hideB.setAttribute("aria-pressed", String(hide)); paint(); }, true);
+  const loopB = chip("🔁 Repetir línea", () => { loopIdx = loopIdx >= 0 ? -1 : cur; loopB.setAttribute("aria-pressed", String(loopIdx >= 0)); }, false);
+  const playing = () => { try { return media.style.display === "block" ? !media.paused : PL && PL.getPlayerState() === 1; } catch (e) { return false; } };
+  const pick = h("input", { type: "file", accept: "audio/*,video/*", style: "display:none", onchange: e => {
+    const f = e.target.files[0]; if (!f) return;
+    LOCAL = { vid: v.id, url: URL.createObjectURL(f) };
+    if (PL) { try { PL.destroy(); } catch (x) {} PL = null; }
+    useLocal(LOCAL.url);
+  } });
+  root("videos", h("button", { class: "back", onclick: videos }, "← Videos"), h("h2", {}, v.title),
+    h("div", { class: "sticky" }, wrap, media, h("div", { class: "ctl" },
+      chip("⏪ 5 s", () => ad && ad.seek(Math.max(0, ad.time() - 5))), chip("⏯", () => ad && (playing() ? ad.pause() : ad.play())), chip("5 s ⏩", () => ad && ad.seek(ad.time() + 5)),
+      speeds.map(s => s[1]), timed ? [hideB, loopB] : null)),
+    note,
+    h("div", { class: "row" }, v.yt ? h("a", { class: "chip", href: "https://www.youtube.com/watch?v=" + v.yt, target: "_blank", rel: "noopener", style: "text-decoration:none" }, "Abrir en YouTube") : null,
+      chip("🎧 Usar mi audio o video", () => pick.click()), pick,
+      v.mine ? chip("✏️ Transcripción", () => addVideo(v)) : null,
+      v.mine ? chip("Quitar", () => { if (confirm("¿Quitar este video?")) { S.mySongs = S.mySongs.filter(x => x.id !== v.id); save(); videos(); } }) : null),
+    els.length ? h("div", {}, els) : h("p", { class: "tiny" }, "Sin transcripción todavía. Pulsa ✏️ Transcripción para pegarla."));
+  paint();
+  const my = VIEW;
+  if (LOCAL && LOCAL.vid === v.id) useLocal(LOCAL.url);
+  else if (!v.yt) note.textContent = "Este elemento no tiene enlace de YouTube. Carga tu propio audio o video.";
+  else if (location.protocol === "file:") fail("YouTube no reproduce videos en un archivo abierto desde tu disco (error 153). Abre la app desde https o localhost.");
+  else loadYT().then(() => {
+    if (my !== VIEW) return;
+    PL = new YT.Player(holder, { videoId: v.yt, host: "https://www.youtube-nocookie.com", playerVars: { rel: 0, playsinline: 1, origin: location.origin },
+      events: { onReady: () => { ad = adaptYT(PL); if (resume) PL.seekTo(resume, true); ad.rate(rate); }, onError: e => fail(YE[e.data] || "No se pudo cargar el video (código " + e.data + ").") } });
+  });
+  if (timed) VT = setInterval(() => {
+    if (!ad) return;
+    try {
+      const t = ad.time();
+      if (loopIdx >= 0 && t >= cues[loopIdx].end) { ad.seek(cues[loopIdx].t); return; }
+      let i = -1; for (let k = 0; k < cues.length; k++) { if (cues[k].t <= t + 0.2) i = k; else break; }
+      if (i !== cur) { cur = i; paint(); if (i >= 0) els[i].scrollIntoView({ block: "center", behavior: "smooth" }); }
+    } catch (e) {}
+  }, 250);
 }
 
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js");
